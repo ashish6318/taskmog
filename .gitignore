@@ -11,6 +11,19 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Documentation files (keep locally, exclude from repo)
+BEHAVIORAL-INTERVIEW-GUIDE.md
+CODING-INTERVIEW-QUESTIONS.md
+CORS-FIX.md
+INTERVIEW-PREPARATION-GUIDE.md
+POSTMAN-SETUP-GUIDE.md
+SCORING-TESTS.md
+SUBMISSION-CHECKLIST.md
+SYSTEM-DESIGN-INTERVIEW-GUIDE.md
+TECHNICAL-CHEAT-SHEET.md
+TESTING-GUIDE.md
+TESTING-RESULTS.md
+
 # Logs
 logs
 *.log
