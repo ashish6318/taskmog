@@ -1,0 +1,182 @@
+{
+  "info": {
+    "name": "Chapter Performance API",
+    "description": "API for managing chapter performance data with filtering, pagination, and file upload",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "health"]
+        }
+      }
+    },
+    {
+      "name": "Get All Chapters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters"]
+        }
+      }
+    },
+    {
+      "name": "Get Chapters - Filter by Subject",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters?subject=Physics",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters"],
+          "query": [
+            {
+              "key": "subject",
+              "value": "Physics"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Chapters - Filter by Class",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters?class=Class 11",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters"],
+          "query": [
+            {
+              "key": "class",
+              "value": "Class 11"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Chapters - Pagination",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters?page=1&limit=10",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Chapters - Weak Chapters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters?isWeakChapter=true",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters"],
+          "query": [
+            {
+              "key": "isWeakChapter",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Chapter by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters/683fbaa01f4368e35c85d739",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters", "683fbaa01f4368e35c85d739"]
+        }
+      }
+    },    {
+      "name": "Create Chapter (Admin Only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"subject\": \"Physics\",\n  \"chapter\": \"Test Chapter from Postman\",\n  \"class\": \"Class 11\",\n  \"unit\": \"Test Unit\",\n  \"status\": \"Not Started\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters/single",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters", "single"]
+        }
+      }
+    },
+    {
+      "name": "Upload Chapter File (Admin Only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer chapter-admin-secret-key-2024"
+          }
+        ],        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "chapters",
+              "type": "file",
+              "src": "/path/to/chapters.json"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/chapters",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "chapters"]
+        }
+      }
+    }
+  ],  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "chapter-admin-secret-key-2024",
+      "type": "string"
+    }
+  ]
+}

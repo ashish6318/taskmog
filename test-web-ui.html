@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter Performance API Tester</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .test-section h2 {
+            color: #444;
+            margin-top: 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .admin-button {
+            background-color: #dc3545;
+        }
+        .admin-button:hover {
+            background-color: #c82333;
+        }
+        #results {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+        .input-group input, .input-group select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 200px;
+        }
+        .status-ok { color: #28a745; }
+        .status-error { color: #dc3545; }
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            background-color: #e9ecef;
+            padding: 5px;
+            border-radius: 3px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Chapter Performance API Tester</h1>
+        
+        <div class="test-section">
+            <h2>🏥 Health Check</h2>
+            <p>Test if the API server is running</p>
+            <div class="endpoint-url">GET /api/v1/health</div>
+            <button id="healthCheckBtn">Test Health Check</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📚 Get All Chapters</h2>
+            <p>Retrieve chapters with optional filtering</p>
+            <div class="input-group">
+                <label>Subject:</label>
+                <select id="subject">
+                    <option value="">All Subjects</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Mathematics">Mathematics</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Class:</label>
+                <select id="class">
+                    <option value="">All Classes</option>
+                    <option value="Class 11">Class 11</option>
+                    <option value="Class 12">Class 12</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Status:</label>
+                <select id="status">
+                    <option value="">All Statuses</option>
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Limit:</label>
+                <input type="number" id="limit" value="10" min="1" max="50">
+            </div>
+            <button id="getChaptersBtn">Get Chapters</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Get Single Chapter</h2>
+            <p>Get details of a specific chapter by ID</p>
+            <div class="input-group">
+                <label>Chapter ID:</label>
+                <input type="text" id="chapterId" placeholder="Enter chapter ID">
+            </div>            <button id="getChapterBtn">Get Chapter</button>
+            <button id="getFirstIdBtn">Use First Chapter ID</button>
+        </div>
+
+        <div class="test-section">
+            <h2>➕ Create Chapter (Admin Only)</h2>
+            <p>Create a new chapter (requires admin token)</p>
+            <div class="input-group">
+                <label>Subject:</label>
+                <select id="newSubject">
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Mathematics">Mathematics</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Chapter:</label>
+                <input type="text" id="newChapter" placeholder="Chapter name">
+            </div>
+            <div class="input-group">
+                <label>Class:</label>
+                <select id="newClass">
+                    <option value="Class 11">Class 11</option>
+                    <option value="Class 12">Class 12</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Unit:</label>
+                <input type="text" id="newUnit" placeholder="Unit name">
+            </div>
+            <div class="input-group">
+                <label>Admin Token:</label>
+                <input type="password" id="adminToken" value="chapter-admin-secret-key-2024">
+            </div>
+            <button class="admin-button" id="createChapterBtn">Create Chapter</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Test Results</h2>
+            <div id="results">Click any test button above to see results here...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/v1';
+        
+        function logResult(message, isError = false) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const status = isError ? 'ERROR' : 'SUCCESS';
+            const className = isError ? 'status-error' : 'status-ok';
+            results.innerHTML += `[${timestamp}] <span class="${className}">${status}</span>: ${message}\n\n`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                logResult(`Making request to: ${url}`);
+                const response = await fetch(url, options);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    logResult(`Response (${response.status}): ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    logResult(`Error (${response.status}): ${JSON.stringify(data, null, 2)}`, true);
+                }
+                return { response, data };
+            } catch (error) {
+                logResult(`Network Error: ${error.message}`, true);
+                throw error;
+            }
+        }
+
+        async function testHealthCheck() {
+            await makeRequest(`${API_BASE}/health`);
+        }
+
+        async function testGetChapters() {
+            const params = new URLSearchParams();
+            
+            const subject = document.getElementById('subject').value;
+            const className = document.getElementById('class').value;
+            const status = document.getElementById('status').value;
+            const limit = document.getElementById('limit').value;
+            
+            if (subject) params.append('subject', subject);
+            if (className) params.append('class', className);
+            if (status) params.append('status', status);
+            if (limit) params.append('limit', limit);
+            
+            const url = `${API_BASE}/chapters${params.toString() ? '?' + params.toString() : ''}`;
+            await makeRequest(url);
+        }
+
+        async function testGetChapter() {
+            const chapterId = document.getElementById('chapterId').value;
+            if (!chapterId) {
+                logResult('Please enter a chapter ID', true);
+                return;
+            }
+            await makeRequest(`${API_BASE}/chapters/${chapterId}`);
+        }
+
+        async function getFirstChapterId() {
+            try {
+                const { data } = await makeRequest(`${API_BASE}/chapters?limit=1`);
+                if (data.success && data.data.chapters.length > 0) {
+                    const firstChapterId = data.data.chapters[0]._id;
+                    document.getElementById('chapterId').value = firstChapterId;
+                    logResult(`First chapter ID: ${firstChapterId}`);
+                }
+            } catch (error) {
+                logResult('Could not get first chapter ID', true);
+            }
+        }
+
+        async function testCreateChapter() {
+            const subject = document.getElementById('newSubject').value;
+            const chapter = document.getElementById('newChapter').value;
+            const className = document.getElementById('newClass').value;
+            const unit = document.getElementById('newUnit').value;
+            const token = document.getElementById('adminToken').value;
+            
+            if (!chapter || !unit) {
+                logResult('Please fill in chapter name and unit', true);
+                return;
+            }
+            
+            const chapterData = {
+                subject,
+                chapter,
+                class: className,
+                unit,
+                status: 'Not Started'
+            };
+            
+            await makeRequest(`${API_BASE}/chapters/single`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(chapterData)
+            });
+        }
+
+        // Clear results
+        function clearResults() {
+            document.getElementById('results').innerHTML = 'Results cleared...\n\n';
+        }        // Auto-populate some test data
+        document.getElementById('newChapter').value = 'Test Chapter from Web UI';
+        document.getElementById('newUnit').value = 'Test Unit';
+
+        // Add event listeners when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Button event listeners
+            document.getElementById('healthCheckBtn').addEventListener('click', testHealthCheck);
+            document.getElementById('getChaptersBtn').addEventListener('click', testGetChapters);
+            document.getElementById('getChapterBtn').addEventListener('click', testGetChapter);
+            document.getElementById('getFirstIdBtn').addEventListener('click', getFirstChapterId);
+            document.getElementById('createChapterBtn').addEventListener('click', testCreateChapter);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chapter Performance API - Simple Test</h1>
+    
+    <div>
+        <h2>Basic Tests</h2>
+        <button onclick="testHealth()">Health Check</button>
+        <button onclick="testChapters()">Get Chapters (5)</button>
+        <button onclick="testFiltering()">Test Filtering</button>
+        <button onclick="testPagination()">Test Pagination</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="results">Click a button to test the API...</div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/v1';
+
+        function logResult(message, isError = false) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const status = isError ? '❌ ERROR' : '✅ SUCCESS';
+            results.innerHTML += `[${timestamp}] ${status}: ${message}\n\n`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                logResult(`Health Check: ${data.status} - Server uptime: ${Math.round(data.uptime)}s`);
+            } catch (error) {
+                logResult(`Health Check Failed: ${error.message}`, true);
+            }
+        }
+
+        async function testChapters() {
+            try {
+                const response = await fetch(`${API_BASE}/chapters?limit=5`);
+                const data = await response.json();
+                logResult(`Got ${data.data.chapters.length} chapters out of ${data.data.total} total`);
+                logResult(`First chapter: ${data.data.chapters[0].subject} - ${data.data.chapters[0].chapter}`);
+            } catch (error) {
+                logResult(`Get Chapters Failed: ${error.message}`, true);
+            }
+        }
+
+        async function testFiltering() {
+            try {
+                const response = await fetch(`${API_BASE}/chapters?subject=Physics&limit=3`);
+                const data = await response.json();
+                logResult(`Physics chapters: Found ${data.data.chapters.length} chapters`);
+                if (data.data.chapters.length > 0) {
+                    logResult(`Sample: ${data.data.chapters[0].chapter} (${data.data.chapters[0].class})`);
+                }
+            } catch (error) {
+                logResult(`Filtering Test Failed: ${error.message}`, true);
+            }
+        }
+
+        async function testPagination() {
+            try {
+                const response = await fetch(`${API_BASE}/chapters?page=2&limit=5`);
+                const data = await response.json();
+                logResult(`Page 2 Results: ${data.data.chapters.length} chapters`);
+                logResult(`Pagination: Page ${data.data.currentPage} of ${data.data.totalPages}`);
+            } catch (error) {
+                logResult(`Pagination Test Failed: ${error.message}`, true);
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = 'Results cleared...\n\n';
+        }
+
+        // Test on page load
+        window.onload = function() {
+            logResult('Page loaded. API Base URL: ' + API_BASE);
+        };
+    </script>
+</body>
+</html>
