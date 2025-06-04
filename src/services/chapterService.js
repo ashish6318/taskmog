@@ -6,11 +6,17 @@ class ChapterService {
   async getAllChapters(filters = {}, page = 1, limit = 10) {
     try {
       // Generate cache key
-      const cacheKey = cacheService.generateChaptersListKey(filters, page, limit);
-        // Try to get from cache first
+      const cacheKey = cacheService.generateChaptersListKey(filters, page, limit);      // Try to get from cache first
       const cachedResult = await cacheService.get(cacheKey);
       if (cachedResult) {
-        return cachedResult;
+        return {
+          ...cachedResult,
+          cache: {
+            hit: true,
+            key: cacheKey,
+            timestamp: new Date().toISOString()
+          }
+        };
       }
 
       // Build query
@@ -40,9 +46,28 @@ class ChapterService {
       // Calculate pagination info
       const totalPages = Math.ceil(totalChapters / limit);
       const hasNextPage = page < totalPages;
-      const hasPrevPage = page > 1;
+      const hasPrevPage = page > 1;      const result = {
+        success: true,
+        data: {
+          chapters,
+          pagination: {
+            currentPage: page,
+            totalPages,
+            totalChapters,
+            hasNextPage,
+            hasPrevPage,
+            limit
+          }
+        },
+        cache: {
+          hit: false,
+          key: cacheKey,
+          timestamp: new Date().toISOString()
+        }
+      };
 
-      const result = {
+      // Cache the result (without cache indicators to avoid storing them)
+      const resultToCache = {
         success: true,
         data: {
           chapters,
@@ -56,9 +81,7 @@ class ChapterService {
           }
         }
       };
-
-      // Cache the result
-      await cacheService.set(cacheKey, result);      return result;
+      await cacheService.set(cacheKey, resultToCache);return result;
     } catch (error) {
       throw error;
     }
@@ -68,11 +91,17 @@ class ChapterService {
   async getChapterById(id) {
     try {
       // Generate cache key
-      const cacheKey = cacheService.generateChapterKey(id);
-        // Try to get from cache first
+      const cacheKey = cacheService.generateChapterKey(id);      // Try to get from cache first
       const cachedChapter = await cacheService.get(cacheKey);
       if (cachedChapter) {
-        return cachedChapter;
+        return {
+          ...cachedChapter,
+          cache: {
+            hit: true,
+            key: cacheKey,
+            timestamp: new Date().toISOString()
+          }
+        };
       }
 
       const chapter = await Chapter.findById(id).lean();
@@ -82,15 +111,22 @@ class ChapterService {
           success: false,
           error: 'Chapter not found'
         };
-      }
+      }      const result = {
+        success: true,
+        data: chapter,
+        cache: {
+          hit: false,
+          key: cacheKey,
+          timestamp: new Date().toISOString()
+        }
+      };
 
-      const result = {
+      // Cache the result (without cache indicators)
+      const resultToCache = {
         success: true,
         data: chapter
       };
-
-      // Cache the result
-      await cacheService.set(cacheKey, result);
+      await cacheService.set(cacheKey, resultToCache);
 
       return result;
     } catch (error) {
