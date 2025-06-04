@@ -130,75 +130,52 @@ node test-api.js
 
 Import the provided Postman collection: `Chapter-Performance-API.postman_collection.json`
 
-## 🌐 Deployment
+## 🌐 Deployment on Render
 
-### Deploy to Render
+### Step-by-Step Render Deployment
 
 1. **Create a new Web Service** on [Render](https://render.com)
 
-2. **Connect your repository**
+2. **Connect your GitHub repository**
 
 3. **Configure Build & Deploy Settings**:
 
-   ```
-   Build Command: npm install
-   Start Command: npm start
-   ```
+   - **Root Directory**: `chapter-performance-api`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
 
-4. **Set Environment Variables**:
+4. **Set Environment Variables** in Render Dashboard:
 
    ```
    NODE_ENV=production
    MONGODB_URI=<your-mongodb-atlas-uri>
    REDIS_URL=<your-redis-cloud-uri>  # Optional
-   ADMIN_SECRET_KEY=<your-secret-key>
+   ADMIN_SECRET_KEY=<your-strong-secret-key>
+   RATE_LIMIT_WINDOW_MS=60000
+   RATE_LIMIT_MAX_REQUESTS=30
+   CACHE_TTL=3600
    ```
 
-5. **Deploy** - Render will automatically deploy your API
+5. **Add Database Services** (Optional):
 
-### Deploy to Railway
+   - Add MongoDB service or use MongoDB Atlas
+   - Add Redis service or use Redis Cloud
 
-1. **Create a new project** on [Railway](https://railway.app)
+6. **Deploy** - Render will automatically build and deploy your API
 
-2. **Connect your repository**
+### Database Setup for Render
 
-3. **Add MongoDB & Redis services** (optional)
+**MongoDB Atlas (Recommended)**:
 
-4. **Set Environment Variables** in Railway dashboard
+1. Create a free MongoDB Atlas cluster
+2. Get connection string: `mongodb+srv://username:password@cluster.mongodb.net/chapter-performance-db`
+3. Add to Render environment variables
 
-5. **Deploy** - Railway will handle the deployment
+**Redis Cloud (Optional)**:
 
-### Deploy to Heroku
-
-1. **Create a new Heroku app**:
-
-   ```bash
-   heroku create your-app-name
-   ```
-
-2. **Add MongoDB addon**:
-
-   ```bash
-   heroku addons:create mongolab
-   ```
-
-3. **Add Redis addon** (optional):
-
-   ```bash
-   heroku addons:create heroku-redis
-   ```
-
-4. **Set environment variables**:
-
-   ```bash
-   heroku config:set NODE_ENV=production
-   heroku config:set ADMIN_SECRET_KEY=your-secret-key
-   ```
-
-5. **Deploy**:
-   ```bash
-   git push heroku main
-   ```
+1. Create a free Redis Cloud instance
+2. Get connection URL: `redis://username:password@host:port`
+3. Add to Render environment variables
 
 ## 🔑 Production Considerations
 
@@ -433,63 +410,41 @@ GET /api/v1/health
 - **Cache Invalidation**: Automatic cache clearing on data changes
 - **Cache Keys**: Structured cache key generation for efficient lookups
 
-## 🚀 Deployment
+## 🚀 Production Deployment on Render
 
-### Environment Variables for Production
+Your API is deployed and ready! Here's what you need:
+
+### Environment Variables for Render
 
 ```env
 NODE_ENV=production
-PORT=3000
+PORT=10000  # Render will set this automatically
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/chapter-performance-db
-REDIS_URL=redis://username:password@host:port
-ADMIN_SECRET_KEY=strong-random-secret-key
+REDIS_URL=redis://username:password@host:port  # Optional
+ADMIN_SECRET_KEY=strong-random-secret-key-change-this
+RATE_LIMIT_WINDOW_MS=60000
+RATE_LIMIT_MAX_REQUESTS=30
+CACHE_TTL=3600
 ```
 
-### Deployment Platforms
+### Post-Deployment Steps
 
-#### Railway
+1. **Test Your Deployed API**:
 
-1. Connect your GitHub repository to Railway
-2. Set environment variables in Railway dashboard
-3. Deploy automatically
+   - Health Check: `https://your-render-app.onrender.com/api/v1/health`
+   - Get Chapters: `https://your-render-app.onrender.com/api/v1/chapters`
 
-#### Render
-
-1. Connect your GitHub repository to Render
-2. Configure environment variables
-3. Deploy with auto-scaling
-
-#### Heroku
-
-1. Create a new Heroku app:
+2. **Seed Your Database** (if needed):
 
    ```bash
-   heroku create your-app-name
+   # Run this command in Render's console or via a manual deploy
+   npm run seed
    ```
 
-2. Add MongoDB addon:
-
-   ```bash
-   heroku addons:create mongolab
-   ```
-
-3. Add Redis addon (optional):
-
-   ```bash
-   heroku addons:create heroku-redis
-   ```
-
-4. Set environment variables:
-
-   ```bash
-   heroku config:set NODE_ENV=production
-   heroku config:set ADMIN_SECRET_KEY=your-secret-key
-   ```
-
-5. Deploy:
-   ```bash
-   git push heroku main
-   ```
+3. **Monitor Your Deployment**:
+   - Check Render dashboard for logs
+   - Monitor API performance
+   - Set up uptime monitoring
 
 ## 📝 Scripts
 
